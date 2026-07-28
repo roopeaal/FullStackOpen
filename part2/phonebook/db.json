@@ -1,0 +1,25 @@
+{
+  "persons": [
+    {
+      "name": "Matti Meikäläinen",
+      "number": "040-1234569",
+      "id": "1"
+    },
+    {
+      "name": "Liisa Virtanen",
+      "number": "050-2345678",
+      "id": "2"
+    },
+    {
+      "name": "Pekka Korhonen",
+      "number": "044-3456789",
+      "id": "3"
+    },
+    {
+      "name": "Sanna Laine",
+      "number": "045-4567890",
+      "id": "4"
+    }
+  ],
+  "$schema": "./node_modules/json-server/schema.json"
+}
