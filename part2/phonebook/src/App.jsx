@@ -64,15 +64,24 @@ const App = () => {
           setNewName('')
           setNewNumber('')
         })
-        .catch(() => {
-          showNotification(
-            `Information of ${existingPerson.name} has already been removed from server`,
-            'error'
-          )
+        .catch(error => {
+          if (error.response?.status === 404) {
+            showNotification(
+              `Information of ${existingPerson.name} has already been removed from server`,
+              'error'
+            )
 
-          setPersons(persons.filter(
-            person => person.id !== existingPerson.id
-          ))
+            setPersons(persons.filter(
+              person => person.id !== existingPerson.id
+            ))
+          } else {
+            showNotification(
+              error.response?.data?.error ||
+                `Could not update ${existingPerson.name}`,
+              'error'
+            )
+          }
+
           setNewName('')
           setNewNumber('')
         })
@@ -93,8 +102,12 @@ const App = () => {
         setNewName('')
         setNewNumber('')
       })
-      .catch(() => {
-        showNotification(`Could not add ${newName}`, "error")
+      .catch(error => {
+        showNotification(
+          error.response?.data?.error ||
+            `Could not add ${newName}`,
+          'error'
+        )
       })
   }
 
@@ -116,6 +129,7 @@ const App = () => {
           `Information of ${person.name} has already been removed from server`,
           'error'
         )
+
         setPersons(persons.filter(item => item.id !== person.id))
       })
   }
