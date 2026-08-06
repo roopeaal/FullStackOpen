@@ -44,6 +44,15 @@ test('blogs are returned as json and correct amount', async () => {
   )
 })
 
+test('unique identifier is named id', async () => {
+  const response = await api.get('/api/blogs')
+
+  const firstBlog = response.body[0]
+
+  assert.ok(firstBlog.id)
+  assert.strictEqual(firstBlog._id, undefined)
+})
+
 after(async () => {
   await mongoose.connection.close()
 })
