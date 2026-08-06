@@ -56,3 +56,58 @@ describe('total likes', () => {
     assert.strictEqual(listHelper.totalLikes(blogs), 20)
   })
 })
+
+describe('favorite blog', () => {
+  test('of empty list is null', () => {
+    assert.strictEqual(listHelper.favoriteBlog([]), null)
+  })
+
+  test('when list has only one blog, returns that blog', () => {
+    const blog = {
+      title: 'Ensimmäinen blogi',
+      author: 'Matti Meikäläinen',
+      url: 'https://example.com/1',
+      likes: 5,
+    }
+
+    assert.deepStrictEqual(
+      listHelper.favoriteBlog([blog]),
+      blog
+    )
+  })
+
+  test('of a larger list is the blog with most likes', () => {
+    const blogs = [
+      {
+        title: 'Ensimmäinen blogi',
+        author: 'Matti Meikäläinen',
+        url: 'https://example.com/1',
+        likes: 5,
+      },
+      {
+        title: 'Suosituin blogi',
+        author: 'Maija Mäkinen',
+        url: 'https://example.com/2',
+        likes: 12,
+      },
+      {
+        title: 'Kolmas blogi',
+        author: 'Teemu Testaaja',
+        url: 'https://example.com/3',
+        likes: 3,
+      },
+    ]
+
+    const expected = {
+      title: 'Suosituin blogi',
+      author: 'Maija Mäkinen',
+      url: 'https://example.com/2',
+      likes: 12,
+    }
+
+    assert.deepStrictEqual(
+      listHelper.favoriteBlog(blogs),
+      expected
+    )
+  })
+})
