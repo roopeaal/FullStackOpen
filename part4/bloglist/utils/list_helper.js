@@ -20,8 +20,38 @@ const favoriteBlog = (blogs) => {
   })
 }
 
+const mostBlogs = (blogs) => {
+  if (blogs.length === 0) {
+    return null
+  }
+
+  const blogCounts = blogs.reduce((counts, blog) => {
+    const currentCount = counts.get(blog.author) || 0
+
+    counts.set(blog.author, currentCount + 1)
+
+    return counts
+  }, new Map())
+
+  return [...blogCounts.entries()].reduce(
+    (topAuthor, [author, blogCount]) => {
+      return blogCount > topAuthor.blogs
+        ? {
+            author,
+            blogs: blogCount,
+          }
+        : topAuthor
+    },
+    {
+      author: null,
+      blogs: 0,
+    }
+  )
+}
+
 module.exports = {
   dummy,
   totalLikes,
   favoriteBlog,
+  mostBlogs,
 }

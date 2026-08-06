@@ -6,16 +6,12 @@ const listHelper = require('../utils/list_helper')
 test('dummy returns one', () => {
   const blogs = []
 
-  const result = listHelper.dummy(blogs)
-
-  assert.strictEqual(result, 1)
+  assert.strictEqual(listHelper.dummy(blogs), 1)
 })
 
 describe('total likes', () => {
   test('of empty list is zero', () => {
-    const blogs = []
-
-    assert.strictEqual(listHelper.totalLikes(blogs), 0)
+    assert.strictEqual(listHelper.totalLikes([]), 0)
   })
 
   test('when list has only one blog, equals its likes', () => {
@@ -98,16 +94,71 @@ describe('favorite blog', () => {
       },
     ]
 
-    const expected = {
-      title: 'Suosituin blogi',
-      author: 'Maija Mäkinen',
-      url: 'https://example.com/2',
-      likes: 12,
-    }
-
     assert.deepStrictEqual(
       listHelper.favoriteBlog(blogs),
-      expected
+      blogs[1]
+    )
+  })
+})
+
+describe('author with most blogs', () => {
+  test('of empty list is null', () => {
+    assert.strictEqual(listHelper.mostBlogs([]), null)
+  })
+
+  test('when list has one blog, returns its author', () => {
+    const blogs = [
+      {
+        title: 'Ensimmäinen blogi',
+        author: 'Matti Meikäläinen',
+        url: 'https://example.com/1',
+        likes: 5,
+      },
+    ]
+
+    assert.deepStrictEqual(
+      listHelper.mostBlogs(blogs),
+      {
+        author: 'Matti Meikäläinen',
+        blogs: 1,
+      }
+    )
+  })
+
+  test('returns author with the largest number of blogs', () => {
+    const blogs = [
+      {
+        title: 'Blogi yksi',
+        author: 'Maija Mäkinen',
+        url: 'https://example.com/1',
+        likes: 5,
+      },
+      {
+        title: 'Blogi kaksi',
+        author: 'Matti Meikäläinen',
+        url: 'https://example.com/2',
+        likes: 2,
+      },
+      {
+        title: 'Blogi kolme',
+        author: 'Maija Mäkinen',
+        url: 'https://example.com/3',
+        likes: 8,
+      },
+      {
+        title: 'Blogi neljä',
+        author: 'Maija Mäkinen',
+        url: 'https://example.com/4',
+        likes: 1,
+      },
+    ]
+
+    assert.deepStrictEqual(
+      listHelper.mostBlogs(blogs),
+      {
+        author: 'Maija Mäkinen',
+        blogs: 3,
+      }
     )
   })
 })
