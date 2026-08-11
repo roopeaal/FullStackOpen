@@ -9,6 +9,7 @@ const supertest = require('supertest')
 
 const app = require('../app')
 const Blog = require('../models/blog')
+const User = require('../models/user')
 
 const api = supertest(app)
 
@@ -29,7 +30,26 @@ const initialBlogs = [
 
 beforeEach(async () => {
   await Blog.deleteMany({})
-  await Blog.insertMany(initialBlogs)
+  await User.deleteMany({})
+
+  const user = new User({
+    username: 'testuser',
+    name: 'Testi Käyttäjä',
+    passwordHash: 'testhash',
+  })
+
+  await user.save()
+
+  const blogs = await Blog.insertMany(
+    initialBlogs.map(blog => ({
+      ...blog,
+      user: user._id,
+    }))
+  )
+
+  user.blogs = blogs.map(blog => blog._id)
+
+  await user.save()
 })
 
 test('blogs are returned as json and correct amount', async () => {
@@ -51,6 +71,40 @@ test('unique identifier is named id', async () => {
 
   assert.ok(firstBlog.id)
   assert.strictEqual(firstBlog._id, undefined)
+})
+
+test('blogs contain creator information', async () => {
+  const response = await api.get('/api/blogs')
+
+  assert.strictEqual(
+    response.body[0].user.username,
+    'testuser'
+  )
+
+  assert.strictEqual(
+    response.body[0].user.name,
+    'Testi Käyttäjä'
+  )
+})
+
+test('users contain their blogs', async () => {
+  const response = await api
+    .get('/api/users')
+    .expect(200)
+    .expect('Content-Type', /application\/json/)
+
+  const user = response.body.find(
+    user => user.username === 'testuser'
+  )
+
+  assert.strictEqual(
+    user.blogs.length,
+    initialBlogs.length
+  )
+
+  const titles = user.blogs.map(blog => blog.title)
+
+  assert(titles.includes('Ensimmäinen testiblogi'))
 })
 
 test('a valid blog can be added', async () => {
