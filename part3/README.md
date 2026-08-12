@@ -1,5 +1,6 @@
 # Part 3
 
-The exercises for Part 3 are implemented in a separate repository:
+Part 3 continues the Phonebook application from Part 2.
 
-https://github.com/roopeaal/phonebook-backend
+- [Backend](./backend/) — implemented in the separate `phonebook-backend` repository.
+- [Frontend](./frontend/) — continues from `part2/phonebook`.
