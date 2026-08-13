@@ -26,6 +26,7 @@ const App = () => {
   const [url, setUrl] = useState('')
 
   const [notification, setNotification] = useState(null)
+  const [newBlogVisible, setNewBlogVisible] = useState(false)
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
@@ -102,6 +103,7 @@ const App = () => {
       setTitle('')
       setAuthor('')
       setUrl('')
+      setNewBlogVisible(false)
     } catch (exception) {
       showNotification('blog could not be added')
     }
@@ -155,43 +157,57 @@ const App = () => {
         </button>
       </p>
 
-      <h2>create new</h2>
-
-      <form onSubmit={addBlog}>
-        <div>
-          title:
-          <input
-            value={title}
-            onChange={({ target }) =>
-              setTitle(target.value)
-            }
-          />
-        </div>
-
-        <div>
-          author:
-          <input
-            value={author}
-            onChange={({ target }) =>
-              setAuthor(target.value)
-            }
-          />
-        </div>
-
-        <div>
-          url:
-          <input
-            value={url}
-            onChange={({ target }) =>
-              setUrl(target.value)
-            }
-          />
-        </div>
-
-        <button type="submit">
-          create
+      {!newBlogVisible && (
+        <button onClick={() => setNewBlogVisible(true)}>
+          create new blog
         </button>
-      </form>
+      )}
+
+      {newBlogVisible && (
+        <div>
+          <h2>create new</h2>
+
+          <form onSubmit={addBlog}>
+            <div>
+              title:
+              <input
+                value={title}
+                onChange={({ target }) =>
+                  setTitle(target.value)
+                }
+              />
+            </div>
+
+            <div>
+              author:
+              <input
+                value={author}
+                onChange={({ target }) =>
+                  setAuthor(target.value)
+                }
+              />
+            </div>
+
+            <div>
+              url:
+              <input
+                value={url}
+                onChange={({ target }) =>
+                  setUrl(target.value)
+                }
+              />
+            </div>
+
+            <button type="submit">
+              create
+            </button>
+          </form>
+
+          <button onClick={() => setNewBlogVisible(false)}>
+            cancel
+          </button>
+        </div>
+      )}
 
       {blogs.map(blog =>
         <Blog key={blog.id} blog={blog} />
