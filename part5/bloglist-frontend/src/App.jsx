@@ -97,6 +97,38 @@ const App = () => {
     }
   }
 
+  const updateBlog = async blog => {
+    const userId =
+      blog.user?.id ||
+      blog.user?._id ||
+      blog.user
+
+    const changedBlog = {
+      user: userId,
+      likes: blog.likes + 1,
+      author: blog.author,
+      title: blog.title,
+      url: blog.url,
+    }
+
+    try {
+      const returnedBlog = await blogService.update(
+        blog.id,
+        changedBlog
+      )
+
+      setBlogs(
+        blogs.map(currentBlog =>
+          currentBlog.id === blog.id
+            ? returnedBlog
+            : currentBlog
+        )
+      )
+    } catch (exception) {
+      showNotification('blog could not be liked')
+    }
+  }
+
   if (user === null) {
     return (
       <div>
@@ -162,7 +194,11 @@ const App = () => {
       )}
 
       {blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} />
+        <Blog
+          key={blog.id}
+          blog={blog}
+          updateBlog={updateBlog}
+        />
       )}
     </div>
   )
