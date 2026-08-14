@@ -1,22 +1,23 @@
 import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import Blog from './Blog'
 
-test('renders title and author but not url or likes by default', () => {
-  const blog = {
-    title: 'Full Stack Open',
-    author: 'Roope Aaltonen',
-    url: 'https://fullstackopen.com',
-    likes: 7,
-    user: {
-      username: 'roope',
-      name: 'Roope Aaltonen',
-    },
-  }
-
-  const user = {
+const blog = {
+  title: 'Full Stack Open',
+  author: 'Roope Aaltonen',
+  url: 'https://fullstackopen.com',
+  likes: 7,
+  user: {
     username: 'roope',
-  }
+    name: 'Roope Aaltonen',
+  },
+}
 
+const user = {
+  username: 'roope',
+}
+
+test('renders title and author but not url or likes by default', () => {
   render(
     <Blog
       blog={blog}
@@ -37,4 +38,32 @@ test('renders title and author but not url or likes by default', () => {
   expect(
     screen.queryByText(/likes 7/)
   ).toBeNull()
+})
+
+test('shows url and likes after view button is clicked', async () => {
+  const testUser = userEvent.setup()
+
+  render(
+    <Blog
+      blog={blog}
+      updateBlog={() => {}}
+      removeBlog={() => {}}
+      user={user}
+    />
+  )
+
+  const button = screen.getByText('view')
+  await testUser.click(button)
+
+  expect(
+    screen.getByText('https://fullstackopen.com')
+  ).toBeDefined()
+
+  expect(
+    screen.getByText(/likes 7/)
+  ).toBeDefined()
+
+  expect(
+    screen.getByText('Roope Aaltonen')
+  ).toBeDefined()
 })
