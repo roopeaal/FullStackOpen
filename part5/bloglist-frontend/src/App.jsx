@@ -85,7 +85,16 @@ const App = () => {
     try {
       const newBlog = await blogService.create(blogObject)
 
-      setBlogs(blogs.concat(newBlog))
+      const blogWithUser = {
+        ...newBlog,
+        user: {
+          id: newBlog.user,
+          username: user.username,
+          name: user.name,
+        },
+      }
+
+      setBlogs(blogs.concat(blogWithUser))
 
       showNotification(
         `a new blog ${blogObject.title} by ${blogObject.author} added`
@@ -129,6 +138,27 @@ const App = () => {
     }
   }
 
+  const removeBlog = async blog => {
+    const confirmed = window.confirm(
+      `Remove blog ${blog.title} by ${blog.author}?`
+    )
+
+    if (!confirmed) {
+      return
+    }
+
+    try {
+      await blogService.remove(blog.id)
+
+      setBlogs(
+        blogs.filter(currentBlog =>
+          currentBlog.id !== blog.id
+        )
+      )
+    } catch (exception) {
+      showNotification('blog could not be removed')
+    }
+  }
   if (user === null) {
     return (
       <div>
@@ -200,6 +230,8 @@ const App = () => {
             key={blog.id}
             blog={blog}
             updateBlog={updateBlog}
+            removeBlog={removeBlog}
+            user={user}
           />
         )}
     </div>
