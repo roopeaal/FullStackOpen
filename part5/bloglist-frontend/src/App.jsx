@@ -120,7 +120,7 @@ const App = () => {
       setBlogs(
         blogs.map(currentBlog =>
           currentBlog.id === blog.id
-            ? returnedBlog
+            ? { ...returnedBlog, user: blog.user }
             : currentBlog
         )
       )
