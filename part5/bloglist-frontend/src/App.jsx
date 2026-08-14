@@ -70,7 +70,7 @@ const App = () => {
       setUser(loggedInUser)
       setUsername('')
       setPassword('')
-    } catch (exception) {
+    } catch {
       showNotification('wrong username or password')
     }
   }
@@ -101,7 +101,7 @@ const App = () => {
       )
 
       setNewBlogVisible(false)
-    } catch (exception) {
+    } catch {
       showNotification('blog could not be added')
     }
   }
@@ -133,7 +133,7 @@ const App = () => {
             : currentBlog
         )
       )
-    } catch (exception) {
+    } catch {
       showNotification('blog could not be liked')
     }
   }
@@ -155,7 +155,7 @@ const App = () => {
           currentBlog.id !== blog.id
         )
       )
-    } catch (exception) {
+    } catch {
       showNotification('blog could not be removed')
     }
   }
