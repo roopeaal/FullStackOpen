@@ -88,5 +88,31 @@ describe('Blog app', () => {
         page.getByText('Playwright test blog Roope Aaltonen')
       ).toBeVisible()
     })
+
+    test('a blog can be liked', async ({ page }) => {
+      await page
+        .getByRole('button', { name: 'create new blog' })
+        .click()
+
+      const inputs = page.locator('input')
+
+      await inputs.nth(0).fill('Blog to like')
+      await inputs.nth(1).fill('Roope Aaltonen')
+      await inputs.nth(2).fill('https://example.com/like')
+
+      await page.getByRole('button', { name: 'create' }).click()
+
+      await page.getByRole('button', { name: 'view' }).click()
+
+      await expect(
+        page.getByText('likes 0')
+      ).toBeVisible()
+
+      await page.getByRole('button', { name: 'like' }).click()
+
+      await expect(
+        page.getByText('likes 1')
+      ).toBeVisible()
+    })
   })
 })
