@@ -114,5 +114,35 @@ describe('Blog app', () => {
         page.getByText('likes 1')
       ).toBeVisible()
     })
+
+    test('user who created a blog can delete it', async ({ page }) => {
+      await page
+        .getByRole('button', { name: 'create new blog' })
+        .click()
+
+      const inputs = page.locator('input')
+
+      await inputs.nth(0).fill('Blog to remove')
+      await inputs.nth(1).fill('Roope Aaltonen')
+      await inputs.nth(2).fill('https://example.com/remove')
+
+      await page.getByRole('button', { name: 'create' }).click()
+
+      await expect(
+        page.getByText('Blog to remove Roope Aaltonen')
+      ).toBeVisible()
+
+      await page.getByRole('button', { name: 'view' }).click()
+
+      page.once('dialog', async dialog => {
+        await dialog.accept()
+      })
+
+      await page.getByRole('button', { name: 'remove' }).click()
+
+      await expect(
+        page.getByText('Blog to remove Roope Aaltonen')
+      ).not.toBeVisible()
+    })
   })
 })
