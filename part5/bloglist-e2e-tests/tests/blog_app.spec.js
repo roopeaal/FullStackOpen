@@ -56,4 +56,37 @@ describe('Blog app', () => {
       ).toBeVisible()
     })
   })
+
+  describe('When logged in', () => {
+    beforeEach(async ({ page }) => {
+      const inputs = page.locator('input')
+
+      await inputs.nth(0).fill('mluukkai')
+      await inputs.nth(1).fill('salainen')
+
+      await page.getByRole('button', { name: 'login' }).click()
+
+      await expect(
+        page.getByText('Matti Luukkainen logged in')
+      ).toBeVisible()
+    })
+
+    test('a new blog can be created', async ({ page }) => {
+      await page
+        .getByRole('button', { name: 'create new blog' })
+        .click()
+
+      const inputs = page.locator('input')
+
+      await inputs.nth(0).fill('Playwright test blog')
+      await inputs.nth(1).fill('Roope Aaltonen')
+      await inputs.nth(2).fill('https://example.com/playwright')
+
+      await page.getByRole('button', { name: 'create' }).click()
+
+      await expect(
+        page.getByText('Playwright test blog Roope Aaltonen')
+      ).toBeVisible()
+    })
+  })
 })
