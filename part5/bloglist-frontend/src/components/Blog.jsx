@@ -20,7 +20,7 @@ const Blog = ({
     blog.user?.username === user.username
 
   return (
-    <div style={blogStyle}>
+    <div className="blog" style={blogStyle}>
       <div>
         {blog.title} {blog.author}{' '}
         <button onClick={() => setVisible(!visible)}>

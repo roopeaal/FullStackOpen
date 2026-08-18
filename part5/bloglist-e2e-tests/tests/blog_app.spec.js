@@ -191,5 +191,82 @@ describe('Blog app', () => {
         page.getByRole('button', { name: 'remove' })
       ).toHaveCount(0)
     })
+    test('blogs are ordered by likes with most liked first', async ({ page }) => {
+      const createBlog = async (title, author, url) => {
+        await page
+          .getByRole('button', { name: 'create new blog' })
+          .click()
+
+        const inputs = page.locator('input')
+
+        await inputs.nth(0).fill(title)
+        await inputs.nth(1).fill(author)
+        await inputs.nth(2).fill(url)
+
+        await page.getByRole('button', { name: 'create' }).click()
+
+        await expect(
+          page.getByText(`${title} ${author}`)
+        ).toBeVisible()
+      }
+
+      await createBlog(
+        'First blog',
+        'Roope Aaltonen',
+        'https://example.com/first'
+      )
+
+      await createBlog(
+        'Second blog',
+        'Roope Aaltonen',
+        'https://example.com/second'
+      )
+
+      await createBlog(
+        'Third blog',
+        'Roope Aaltonen',
+        'https://example.com/third'
+      )
+
+      const secondBlog = page
+        .locator('.blog')
+        .filter({ hasText: 'Second blog' })
+
+      await secondBlog
+        .getByRole('button', { name: 'view' })
+        .click()
+
+      await secondBlog
+        .getByRole('button', { name: 'like' })
+        .click()
+
+      await expect(secondBlog).toContainText('likes 1')
+
+      const thirdBlog = page
+        .locator('.blog')
+        .filter({ hasText: 'Third blog' })
+
+      await thirdBlog
+        .getByRole('button', { name: 'view' })
+        .click()
+
+      await thirdBlog
+        .getByRole('button', { name: 'like' })
+        .click()
+
+      await expect(thirdBlog).toContainText('likes 1')
+
+      await thirdBlog
+        .getByRole('button', { name: 'like' })
+        .click()
+
+      await expect(thirdBlog).toContainText('likes 2')
+
+      const blogs = page.locator('.blog')
+
+      await expect(blogs.nth(0)).toContainText('Third blog')
+      await expect(blogs.nth(1)).toContainText('Second blog')
+      await expect(blogs.nth(2)).toContainText('First blog')
+    })
   })
 })
