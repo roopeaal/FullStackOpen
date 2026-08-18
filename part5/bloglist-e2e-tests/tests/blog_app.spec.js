@@ -144,5 +144,52 @@ describe('Blog app', () => {
         page.getByText('Blog to remove Roope Aaltonen')
       ).not.toBeVisible()
     })
+
+    test('only creator sees the remove button', async ({ page, request }) => {
+      await request.post('http://localhost:3003/api/users', {
+        data: {
+          name: 'Pekka Virtanen',
+          username: 'pekka',
+          password: 'salainen',
+        },
+      })
+
+      await page
+        .getByRole('button', { name: 'create new blog' })
+        .click()
+
+      const inputs = page.locator('input')
+
+      await inputs.nth(0).fill('Creator only blog')
+      await inputs.nth(1).fill('Roope Aaltonen')
+      await inputs.nth(2).fill('https://example.com/creator')
+
+      await page.getByRole('button', { name: 'create' }).click()
+
+      await page.getByRole('button', { name: 'view' }).click()
+
+      await expect(
+        page.getByRole('button', { name: 'remove' })
+      ).toBeVisible()
+
+      await page.getByRole('button', { name: 'logout' }).click()
+
+      const loginInputs = page.locator('input')
+
+      await loginInputs.nth(0).fill('pekka')
+      await loginInputs.nth(1).fill('salainen')
+
+      await page.getByRole('button', { name: 'login' }).click()
+
+      await expect(
+        page.getByText('Pekka Virtanen logged in')
+      ).toBeVisible()
+
+      await page.getByRole('button', { name: 'view' }).click()
+
+      await expect(
+        page.getByRole('button', { name: 'remove' })
+      ).toHaveCount(0)
+    })
   })
 })
