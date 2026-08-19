@@ -1,6 +1,11 @@
 import { useState, useEffect } from 'react'
+import {
+  Routes,
+  Route,
+  Link,
+  useNavigate,
+} from 'react-router-dom'
 import Blog from './components/Blog'
-import BlogForm from './components/BlogForm'
 import blogService from './services/blogs'
 import loginService from './services/login'
 
@@ -16,14 +21,70 @@ const Notification = ({ message }) => {
   )
 }
 
+const LoginForm = ({
+  username,
+  password,
+  handleUsernameChange,
+  handlePasswordChange,
+  handleSubmit,
+}) => (
+  <div>
+    <h2>Log in to application</h2>
+
+    <form onSubmit={handleSubmit}>
+      <div>
+        username
+        <input
+          value={username}
+          onChange={handleUsernameChange}
+        />
+      </div>
+
+      <div>
+        password
+        <input
+          type="password"
+          value={password}
+          onChange={handlePasswordChange}
+        />
+      </div>
+
+      <button type="submit">login</button>
+    </form>
+  </div>
+)
+
+const BlogList = ({
+  blogs,
+  updateBlog,
+  removeBlog,
+  user,
+}) => (
+  <div>
+    <h2>blogs</h2>
+
+    {[...blogs]
+      .sort((a, b) => b.likes - a.likes)
+      .map(blog =>
+        <Blog
+          key={blog.id}
+          blog={blog}
+          updateBlog={updateBlog}
+          removeBlog={removeBlog}
+          user={user}
+        />
+      )}
+  </div>
+)
+
 const App = () => {
   const [blogs, setBlogs] = useState([])
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
-
   const [notification, setNotification] = useState(null)
-  const [newBlogVisible, setNewBlogVisible] = useState(false)
+
+  const navigate = useNavigate()
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
@@ -36,10 +97,10 @@ const App = () => {
       window.localStorage.getItem('loggedBlogappUser')
 
     if (loggedUserJSON) {
-      const user = JSON.parse(loggedUserJSON)
+      const loggedUser = JSON.parse(loggedUserJSON)
 
-      setUser(user)
-      blogService.setToken(user.token)
+      setUser(loggedUser)
+      blogService.setToken(loggedUser.token)
     }
   }, [])
 
@@ -70,6 +131,7 @@ const App = () => {
       setUser(loggedInUser)
       setUsername('')
       setPassword('')
+      navigate('/')
     } catch {
       showNotification('wrong username or password')
     }
@@ -79,31 +141,7 @@ const App = () => {
     window.localStorage.removeItem('loggedBlogappUser')
     blogService.setToken(null)
     setUser(null)
-  }
-
-  const addBlog = async blogObject => {
-    try {
-      const newBlog = await blogService.create(blogObject)
-
-      const blogWithUser = {
-        ...newBlog,
-        user: {
-          id: newBlog.user,
-          username: user.username,
-          name: user.name,
-        },
-      }
-
-      setBlogs(blogs.concat(blogWithUser))
-
-      showNotification(
-        `a new blog ${blogObject.title} by ${blogObject.author} added`
-      )
-
-      setNewBlogVisible(false)
-    } catch {
-      showNotification('blog could not be added')
-    }
+    navigate('/')
   }
 
   const updateBlog = async blog => {
@@ -159,81 +197,66 @@ const App = () => {
       showNotification('blog could not be removed')
     }
   }
-  if (user === null) {
-    return (
-      <div>
-        <Notification message={notification} />
 
-        <h2>Log in to application</h2>
-
-        <form onSubmit={handleLogin}>
-          <div>
-            username
-            <input
-              value={username}
-              onChange={({ target }) =>
-                setUsername(target.value)
-              }
-            />
-          </div>
-
-          <div>
-            password
-            <input
-              type="password"
-              value={password}
-              onChange={({ target }) =>
-                setPassword(target.value)
-              }
-            />
-          </div>
-
-          <button type="submit">login</button>
-        </form>
-      </div>
-    )
+  const padding = {
+    paddingRight: 5,
   }
 
   return (
     <div>
+      <div>
+        <Link style={padding} to="/">
+          blogs
+        </Link>
+
+        {!user && (
+          <Link style={padding} to="/login">
+            login
+          </Link>
+        )}
+
+        {user && (
+          <span>
+            {user.name} logged in{' '}
+            <button onClick={handleLogout}>
+              logout
+            </button>
+          </span>
+        )}
+      </div>
+
       <Notification message={notification} />
 
-      <h2>blogs</h2>
+      <Routes>
+        <Route
+          path="/login"
+          element={
+            <LoginForm
+              username={username}
+              password={password}
+              handleUsernameChange={({ target }) =>
+                setUsername(target.value)
+              }
+              handlePasswordChange={({ target }) =>
+                setPassword(target.value)
+              }
+              handleSubmit={handleLogin}
+            />
+          }
+        />
 
-      <p>
-        {user.name} logged in{' '}
-        <button onClick={handleLogout}>
-          logout
-        </button>
-      </p>
-
-      {!newBlogVisible && (
-        <button onClick={() => setNewBlogVisible(true)}>
-          create new blog
-        </button>
-      )}
-
-      {newBlogVisible && (
-        <div>
-          <BlogForm createBlog={addBlog} />
-
-          <button onClick={() => setNewBlogVisible(false)}>
-            cancel
-          </button>
-        </div>
-      )}
-
-      {[...blogs]
-        .sort((a, b) => b.likes - a.likes)
-        .map(blog =>
-          <Blog
-            key={blog.id}
-            blog={blog}
-            updateBlog={updateBlog}
-            removeBlog={removeBlog}
-            user={user}
-          />
-        )}
+        <Route
+          path="/"
+          element={
+            <BlogList
+              blogs={blogs}
+              updateBlog={updateBlog}
+              removeBlog={removeBlog}
+              user={user}
+            />
+          }
+        />
+      </Routes>
     </div>
   )
 }

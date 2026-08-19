@@ -17,7 +17,7 @@ const Blog = ({
   }
 
   const canRemove =
-    blog.user?.username === user.username
+    blog.user?.username === user?.username
 
   return (
     <div className="blog" style={blogStyle}>
