@@ -3,10 +3,12 @@ import {
   Routes,
   Route,
   Link,
+  Navigate,
   useNavigate,
   useMatch,
 } from 'react-router-dom'
 import Blog from './components/Blog'
+import BlogForm from './components/BlogForm'
 import blogService from './services/blogs'
 import loginService from './services/login'
 
@@ -144,6 +146,31 @@ const App = () => {
     navigate('/')
   }
 
+  const addBlog = async blogObject => {
+    try {
+      const newBlog = await blogService.create(blogObject)
+
+      const blogWithUser = {
+        ...newBlog,
+        user: {
+          id: newBlog.user,
+          username: user.username,
+          name: user.name,
+        },
+      }
+
+      setBlogs(blogs.concat(blogWithUser))
+
+      showNotification(
+        `a new blog ${blogObject.title} by ${blogObject.author} added`
+      )
+
+      navigate('/')
+    } catch {
+      showNotification('blog could not be added')
+    }
+  }
+
   const updateBlog = async blog => {
     const userId =
       blog.user?.id ||
@@ -193,6 +220,8 @@ const App = () => {
           currentBlog.id !== blog.id
         )
       )
+
+      navigate('/')
     } catch {
       showNotification('blog could not be removed')
     }
@@ -216,12 +245,18 @@ const App = () => {
         )}
 
         {user && (
-          <span>
-            {user.name} logged in{' '}
-            <button onClick={handleLogout}>
-              logout
-            </button>
-          </span>
+          <>
+            <Link style={padding} to="/create">
+              create
+            </Link>
+
+            <span>
+              {user.name} logged in{' '}
+              <button onClick={handleLogout}>
+                logout
+              </button>
+            </span>
+          </>
         )}
       </div>
 
@@ -238,6 +273,15 @@ const App = () => {
               user={user}
               detailed
             />
+          }
+        />
+
+        <Route
+          path="/create"
+          element={
+            user
+              ? <BlogForm createBlog={addBlog} />
+              : <Navigate replace to="/login" />
           }
         />
 
