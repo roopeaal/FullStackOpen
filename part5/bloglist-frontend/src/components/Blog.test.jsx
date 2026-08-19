@@ -1,5 +1,4 @@
 import { render, screen } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import Blog from './Blog'
 
 const blog = {
@@ -13,47 +12,20 @@ const blog = {
   },
 }
 
-const user = {
-  username: 'roope',
-}
-
-test('renders title and author but not url or likes by default', () => {
+test('shows blog information but no buttons to unauthenticated user', () => {
   render(
     <Blog
       blog={blog}
       updateBlog={() => {}}
       removeBlog={() => {}}
-      user={user}
+      user={null}
+      detailed
     />
   )
 
   expect(
     screen.getByText(/Full Stack Open Roope Aaltonen/)
   ).toBeDefined()
-
-  expect(
-    screen.queryByText('https://fullstackopen.com')
-  ).toBeNull()
-
-  expect(
-    screen.queryByText(/likes 7/)
-  ).toBeNull()
-})
-
-test('shows url and likes after view button is clicked', async () => {
-  const testUser = userEvent.setup()
-
-  render(
-    <Blog
-      blog={blog}
-      updateBlog={() => {}}
-      removeBlog={() => {}}
-      user={user}
-    />
-  )
-
-  const button = screen.getByText('view')
-  await testUser.click(button)
 
   expect(
     screen.getByText('https://fullstackopen.com')
@@ -66,27 +38,56 @@ test('shows url and likes after view button is clicked', async () => {
   expect(
     screen.getByText('Roope Aaltonen')
   ).toBeDefined()
+
+  expect(
+    screen.queryAllByRole('button')
+  ).toHaveLength(0)
 })
 
-test('clicking like button twice calls event handler twice', async () => {
-  const mockHandler = vi.fn()
-  const testUser = userEvent.setup()
+test('shows only like button to logged in user who is not creator', () => {
+  const user = {
+    username: 'pekka',
+  }
 
   render(
     <Blog
       blog={blog}
-      updateBlog={mockHandler}
+      updateBlog={() => {}}
       removeBlog={() => {}}
       user={user}
+      detailed
     />
   )
 
-  await testUser.click(screen.getByText('view'))
+  expect(
+    screen.getByRole('button', { name: 'like' })
+  ).toBeDefined()
 
-  const likeButton = screen.getByText('like')
+  expect(
+    screen.queryByRole('button', { name: 'remove' })
+  ).toBeNull()
+})
 
-  await testUser.click(likeButton)
-  await testUser.click(likeButton)
+test('shows like and remove buttons to blog creator', () => {
+  const user = {
+    username: 'roope',
+  }
 
-  expect(mockHandler.mock.calls).toHaveLength(2)
+  render(
+    <Blog
+      blog={blog}
+      updateBlog={() => {}}
+      removeBlog={() => {}}
+      user={user}
+      detailed
+    />
+  )
+
+  expect(
+    screen.getByRole('button', { name: 'like' })
+  ).toBeDefined()
+
+  expect(
+    screen.getByRole('button', { name: 'remove' })
+  ).toBeDefined()
 })
