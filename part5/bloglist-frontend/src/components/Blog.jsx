@@ -5,8 +5,13 @@ const Blog = ({
   updateBlog,
   removeBlog,
   user,
+  detailed = false,
 }) => {
-  const [visible, setVisible] = useState(false)
+  const [visible, setVisible] = useState(detailed)
+
+  if (!blog) {
+    return null
+  }
 
   const blogStyle = {
     paddingTop: 10,
@@ -23,9 +28,12 @@ const Blog = ({
     <div className="blog" style={blogStyle}>
       <div>
         {blog.title} {blog.author}{' '}
-        <button onClick={() => setVisible(!visible)}>
-          {visible ? 'hide' : 'view'}
-        </button>
+
+        {!detailed && (
+          <button onClick={() => setVisible(!visible)}>
+            {visible ? 'hide' : 'view'}
+          </button>
+        )}
       </div>
 
       {visible && (
@@ -34,12 +42,15 @@ const Blog = ({
 
           <div>
             likes {blog.likes}{' '}
-            <button
-              type="button"
-              onClick={() => updateBlog(blog)}
-            >
-              like
-            </button>
+
+            {user && (
+              <button
+                type="button"
+                onClick={() => updateBlog(blog)}
+              >
+                like
+              </button>
+            )}
           </div>
 
           <div>
