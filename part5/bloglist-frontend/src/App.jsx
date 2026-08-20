@@ -7,6 +7,12 @@ import {
   useNavigate,
   useMatch,
 } from 'react-router-dom'
+import {
+  Button,
+  Stack,
+  TextField,
+  Typography,
+} from '@mui/material'
 import Blog from './components/Blog'
 import BlogForm from './components/BlogForm'
 import blogService from './services/blogs'
@@ -32,27 +38,32 @@ const LoginForm = ({
   handleSubmit,
 }) => (
   <div>
-    <h2>Log in to application</h2>
+    <Typography variant="h5" sx={{ mb: 2 }}>
+      Log in to application
+    </Typography>
 
     <form onSubmit={handleSubmit}>
-      <div>
-        username
-        <input
+      <Stack spacing={2} sx={{ maxWidth: 400 }}>
+        <TextField
+          label="username"
           value={username}
           onChange={handleUsernameChange}
         />
-      </div>
 
-      <div>
-        password
-        <input
+        <TextField
+          label="password"
           type="password"
           value={password}
           onChange={handlePasswordChange}
         />
-      </div>
 
-      <button type="submit">login</button>
+        <Button
+          variant="contained"
+          type="submit"
+        >
+          login
+        </Button>
+      </Stack>
     </form>
   </div>
 )
