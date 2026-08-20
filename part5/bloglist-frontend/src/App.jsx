@@ -8,9 +8,14 @@ import {
   useMatch,
 } from 'react-router-dom'
 import {
+  Alert,
+  AppBar,
+  Box,
   Button,
+  Container,
   Stack,
   TextField,
+  Toolbar,
   Typography,
 } from '@mui/material'
 import Blog from './components/Blog'
@@ -18,15 +23,18 @@ import BlogForm from './components/BlogForm'
 import blogService from './services/blogs'
 import loginService from './services/login'
 
-const Notification = ({ message }) => {
-  if (message === null) {
+const Notification = ({ notification }) => {
+  if (notification === null) {
     return null
   }
 
   return (
-    <div>
-      {message}
-    </div>
+    <Alert
+      severity={notification.type}
+      sx={{ mb: 2 }}
+    >
+      {notification.message}
+    </Alert>
   )
 }
 
@@ -117,8 +125,14 @@ const App = () => {
     }
   }, [])
 
-  const showNotification = message => {
-    setNotification(message)
+  const showNotification = (
+    message,
+    type = 'success'
+  ) => {
+    setNotification({
+      message,
+      type,
+    })
 
     setTimeout(() => {
       setNotification(null)
@@ -146,7 +160,10 @@ const App = () => {
       setPassword('')
       navigate('/')
     } catch {
-      showNotification('wrong username or password')
+      showNotification(
+        'wrong username or password',
+        'error'
+      )
     }
   }
 
@@ -178,7 +195,10 @@ const App = () => {
 
       navigate('/')
     } catch {
-      showNotification('blog could not be added')
+      showNotification(
+        'blog could not be added',
+        'error'
+      )
     }
   }
 
@@ -210,7 +230,10 @@ const App = () => {
         )
       )
     } catch {
-      showNotification('blog could not be liked')
+      showNotification(
+        'blog could not be liked',
+        'error'
+      )
     }
   }
 
@@ -234,44 +257,66 @@ const App = () => {
 
       navigate('/')
     } catch {
-      showNotification('blog could not be removed')
+      showNotification(
+        'blog could not be removed',
+        'error'
+      )
     }
   }
 
-  const padding = {
-    paddingRight: 5,
-  }
-
   return (
-    <div>
-      <div>
-        <Link style={padding} to="/">
-          blogs
-        </Link>
+    <Container>
+      <AppBar
+        position="static"
+        sx={{ mb: 3 }}
+      >
+        <Toolbar>
+          <Button
+            color="inherit"
+            component={Link}
+            to="/"
+          >
+            blogs
+          </Button>
 
-        {!user && (
-          <Link style={padding} to="/login">
-            login
-          </Link>
-        )}
+          {!user && (
+            <Button
+              color="inherit"
+              component={Link}
+              to="/login"
+            >
+              login
+            </Button>
+          )}
 
-        {user && (
-          <>
-            <Link style={padding} to="/create">
-              create
-            </Link>
+          {user && (
+            <>
+              <Button
+                color="inherit"
+                component={Link}
+                to="/create"
+              >
+                create
+              </Button>
 
-            <span>
-              {user.name} logged in{' '}
-              <button onClick={handleLogout}>
+              <Box sx={{ flexGrow: 1 }} />
+
+              <Typography>
+                {user.name} logged in
+              </Typography>
+
+              <Button
+                color="inherit"
+                onClick={handleLogout}
+              >
                 logout
-              </button>
-            </span>
-          </>
-        )}
-      </div>
+              </Button>
+            </>
+          )}
+        </Toolbar>
+      </AppBar>
 
-      <Notification message={notification} />
+      <Notification notification={notification} />
 
       <Routes>
         <Route
@@ -320,7 +365,7 @@ const App = () => {
           }
         />
       </Routes>
-    </div>
+    </Container>
   )
 }
 
