@@ -1,4 +1,13 @@
 import { useState } from 'react'
+import {
+  Box,
+  Button,
+  Card,
+  CardContent,
+  Link,
+  Stack,
+  Typography,
+} from '@mui/material'
 
 const Blog = ({
   blog,
@@ -13,61 +22,97 @@ const Blog = ({
     return null
   }
 
-  const blogStyle = {
-    paddingTop: 10,
-    paddingLeft: 2,
-    border: 'solid',
-    borderWidth: 1,
-    marginBottom: 5,
-  }
-
   const canRemove =
     blog.user?.username === user?.username
 
+  const blogUrl =
+    blog.url.startsWith('http://') ||
+    blog.url.startsWith('https://')
+      ? blog.url
+      : `https://${blog.url}`
+
   return (
-    <div className="blog" style={blogStyle}>
-      <div>
-        {blog.title} {blog.author}{' '}
+    <Card
+      className="blog"
+      variant="outlined"
+      sx={{
+        maxWidth: 700,
+        mt: 2,
+      }}
+    >
+      <CardContent>
+        <Stack spacing={2}>
+          <Box>
+            <Typography variant="h4">
+              {blog.title} {blog.author}
+            </Typography>
 
-        {!detailed && (
-          <button onClick={() => setVisible(!visible)}>
-            {visible ? 'hide' : 'view'}
-          </button>
-        )}
-      </div>
-
-      {visible && (
-        <div>
-          <div>{blog.url}</div>
-
-          <div>
-            likes {blog.likes}{' '}
-
-            {user && (
-              <button
-                type="button"
-                onClick={() => updateBlog(blog)}
+            {!detailed && (
+              <Button
+                variant="outlined"
+                size="small"
+                sx={{ mt: 1 }}
+                onClick={() => setVisible(!visible)}
               >
-                like
-              </button>
+                {visible ? 'hide' : 'view'}
+              </Button>
             )}
-          </div>
+          </Box>
 
-          <div>
-            {blog.user?.name || ''}
-          </div>
+          {visible && (
+            <>
+              <Link
+                href={blogUrl}
+                target="_blank"
+                rel="noreferrer"
+              >
+                {blog.url}
+              </Link>
 
-          {canRemove && (
-            <button
-              type="button"
-              onClick={() => removeBlog(blog)}
-            >
-              remove
-            </button>
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1,
+                }}
+              >
+                <Typography>
+                  likes {blog.likes}
+                </Typography>
+
+                {user && (
+                  <Button
+                    variant="contained"
+                    size="small"
+                    type="button"
+                    onClick={() => updateBlog(blog)}
+                  >
+                    like
+                  </Button>
+                )}
+              </Box>
+
+              <Typography>
+                {blog.user?.name || ''}
+              </Typography>
+
+              {canRemove && (
+                <Box>
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    type="button"
+                    onClick={() => removeBlog(blog)}
+                  >
+                    remove
+                  </Button>
+                </Box>
+              )}
+            </>
           )}
-        </div>
-      )}
-    </div>
+        </Stack>
+      </CardContent>
+    </Card>
   )
 }
 
